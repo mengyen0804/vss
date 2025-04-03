@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>采芝早餐 點餐系統</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { background: #fff8dc; font-family: sans-serif; padding: 20px; }
+    h1 { color: #d2691e; }
+    .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .item { background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .order { margin-top: 20px; }
+    button { background: #f4a460; color: white; padding: 10px; border: none; border-radius: 10px; }
+    select, input { margin-top: 5px; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>采芝早餐 點餐系統</h1>
+  <form id="orderForm">
+    <div class="menu" id="menuList"></div>
+    <div class="order">
+      <label>內用 / 外帶：
+        <select id="diningOption">
+          <option>內用</option>
+          <option>外帶</option>
+        </select>
+      </label><br><br>
+      <label>訂購人：
+        <input type="text" id="customerName" required>
+      </label><br><br>
+      <label>備註：
+        <input type="text" id="note" placeholder="例如幾點拿取、要辣椒請在這說">
+      </label><br><br>
+      <button type="submit">送出訂單</button>
+    </div>
+  </form>
+  <script>
+    const menu = [
+      { name: "草莓吐司", price: 20 },
+      { name: "奶油吐司", price: 20 },
+      { name: "花生吐司", price: 20 },
+      { name: "巧克力吐司", price: 20 },
+      { name: "吐司夾蛋", price: 30 },
+      { name: "火腿蛋吐司", price: 40 },
+      { name: "鮪魚蛋吐司", price: 45 },
+      { name: "肉鬆蛋吐司", price: 45 },
+      { name: "法國吐司", price: 50 },
+      { name: "漢堡肉夾蛋吐司", price: 50 },
+      { name: "花生厚片", price: 35 },
+      { name: "草莓厚片", price: 35 },
+      { name: "奶油厚片", price: 35 },
+      { name: "巧克力厚片", price: 35 },
+      { name: "奶酥厚片", price: 40 },
+      { name: "蒜味厚片", price: 40 },
+      { name: "起司厚片", price: 40 },
+      { name: "鮪魚厚片", price: 45 },
+      { name: "特製素食飯糰", price: 45 },
+      { name: "特製紫米飯糰", price: 50 },
+      { name: "招牌紫米燒肉飯糰", price: 65 },
+      { name: "全麥素三明治", price: 30 },
+      { name: "肉鬆三明治", price: 30 },
+      { name: "鮪魚三明治", price: 30 },
+      { name: "火腿三明治", price: 30 },
+      { name: "起司水果三明治", price: 55 },
+      { name: "鮪魚總匯三明治", price: 55 },
+      { name: "招牌燒肉總匯三明治", price: 60 },
+      { name: "古早味蘿蔔糕", price: 35 },
+      { name: "原味蛋餅", price: 30 },
+      { name: "青蔥蛋餅", price: 35 },
+      { name: "芝麻蛋餅", price: 40 },
+      { name: "火腿蛋餅", price: 40 },
+      { name: "肉鬆蛋餅", price: 45 },
+      { name: "鮪魚蛋餅", price: 45 },
+      { name: "起司蛋餅", price: 45 },
+      { name: "蔬菜蛋餅", price: 45 },
+      { name: "玉米蛋餅", price: 45 },
+      { name: "培根蛋餅", price: 50 },
+      { name: "招牌燒肉蛋餅", price: 60 },
+      { name: "紅茶小", price: 20 },
+      { name: "紅茶大", price: 40 },
+      { name: "紅茶豆漿小", price: 20 },
+      { name: "紅茶豆漿大", price: 40 },
+      { name: "養生黃豆漿小", price: 20 },
+      { name: "養生黃豆漿大", price: 40 },
+      { name: "養生黑豆漿小", price: 25 },
+      { name: "養生黑豆漿大", price: 50 },
+      { name: "山藥五穀米漿小", price: 25 },
+      { name: "山藥五穀米漿大", price: 50 },
+      { name: "鮮奶紅茶小", price: 25 },
+      { name: "鮮奶紅茶大", price: 50 },
+      { name: "咖啡牛奶小", price: 40 },
+      { name: "咖啡牛奶大", price: 80 }
+    ];
+
+    const menuList = document.getElementById('menuList');
+    const order = {};
+
+    menu.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `<strong>${item.name}</strong><br>$${item.price}<br>
+        數量：<input type='number' min='0' id='q-${item.name}'>
+        ${item.name.includes('茶') || item.name.includes('漿') || item.name.includes('豆漿') || item.name.includes('牛奶')
+          ? '<br>冰/溫：<select id=\"opt-' + item.name + '\"><option>冰</option><option>溫</option></select>'
+          : ''
+        }
+      `;
+      menuList.appendChild(div);
+    });
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const customerName = document.getElementById('customerName').value;
+      const diningOption = document.getElementById('diningOption').value;
+      const note = document.getElementById('note').value;
+      menu.forEach(item => {
+        const qty = parseInt(document.getElementById('q-' + item.name).value) || 0;
+        if (qty > 0) {
+          order[item.name] = {
+            quantity: qty,
+            option: item.name.includes('茶') || item.name.includes('漿') || item.name.includes('豆漿') || item.name.includes('牛奶')
+              ? document.getElementById('opt-' + item.name).value : ''
+          };
+        }
+      });
+      const payload = {
+        customerName,
+        diningOption,
+        note,
+        orders: order
+      };
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycbyo1h3YfxgLg7qkbp8HD5GTVrmybB6skzMMCb1lLaUdrBbq4nXlYe5GK-b5bKkL1VJn/exec",
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }
+      );
+      const result = await res.json();
+      alert(result.result === 'success' ? '訂單已送出！' : '送出失敗');
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
+
+
