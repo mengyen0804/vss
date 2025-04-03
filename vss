@@ -101,12 +101,13 @@
       div.innerHTML = `<strong>${item.name}</strong><br>$${item.price}<br>
         數量：<input type='number' min='0' id='q-${item.name}'>
         ${item.name.includes('茶') || item.name.includes('漿') || item.name.includes('豆漿') || item.name.includes('牛奶')
-          ? '<br>冰/溫：<select id=\"opt-' + item.name + '\"><option>冰</option><option>溫</option></select>'
+          ? '<br>冰/溫：<select id="opt-' + item.name + '"><option>冰</option><option>溫</option></select>'
           : ''
         }
       `;
       menuList.appendChild(div);
     });
+
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const customerName = document.getElementById('customerName').value;
@@ -143,5 +144,4 @@
   </script>
 </body>
 </html>
-
 
